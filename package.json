@@ -8,8 +8,13 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Sara Gorecki",
-  "dependencies": {},
+  "dependencies": {
+    "bookshelf": "^0.8.1",
+    "knex": "^0.8.6",
+    "pg": "^4.4.1"
+  },
   "devDependencies": {
+    "chai": "^3.2.0",
     "grunt": "^0.4.5",
     "grunt-contrib-jshint": "^0.11.2",
     "grunt-jscs": "^2.0.0"
