@@ -21,6 +21,7 @@
       "catch",
       "typeof"
   ],
+  "requireSpaceBeforeBlockStatements": true,
   "requireParenthesesAroundIIFE": true,
   "requireSpacesInConditionalExpression": true,
   "disallowSpacesInNamedFunctionExpression": {

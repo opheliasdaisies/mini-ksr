@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function(grunt){
+module.exports = function(grunt) {
 
   var projectFiles = ['GruntFile.js', 'lib/**/*.js', 'test/**/*.js'];
 
