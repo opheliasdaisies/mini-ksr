@@ -20,13 +20,21 @@ module.exports = function(grunt) {
       options: {
         config: '.jscsrc'
       }
+    },
+
+    mochaTest: {
+      test: {
+        src: ['tests/**/*.js']
+      }
     }
 
   });
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-jscs');
+  grunt.loadNpmTasks('grunt-mocha-test')
 
   grunt.registerTask('default', ['jshint', 'jscs']);
+  grunt.registerTask('test', 'mochaTest');
 
 };

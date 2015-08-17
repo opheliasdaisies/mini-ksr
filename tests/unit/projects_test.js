@@ -2,7 +2,6 @@
 
 var chai = require('chai');
 var expect = chai.expect;
-var Promise = require('bluebird');
 var projects = require('../../lib/controllers/project');
 var promiseIsExpectedError = require('../testUtils/testPromiseError');
 
