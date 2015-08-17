@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
   var projectFiles = ['GruntFile.js', 'lib/**/*.js', 'test/**/*.js'];
 
@@ -22,6 +22,13 @@ module.exports = function(grunt) {
       }
     },
 
+    jsbeautifier: {
+      files: projectFiles,
+      options: {
+        config: '.jsbeautifyrc'
+      }
+    },
+
     mochaTest: {
       test: {
         src: ['tests/**/*.js'],
@@ -35,9 +42,10 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-jscs');
-  grunt.loadNpmTasks('grunt-mocha-test')
+  grunt.loadNpmTasks('grunt-mocha-test');
+  grunt.loadNpmTasks('grunt-jsbeautifier');
 
-  grunt.registerTask('default', ['jshint', 'jscs']);
+  grunt.registerTask('default', ['jsbeautifier', 'jshint', 'jscs']);
   grunt.registerTask('test', 'mochaTest');
 
 };
