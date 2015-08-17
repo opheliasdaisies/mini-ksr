@@ -2,10 +2,22 @@
 
 var chai = require('chai');
 var expect = chai.expect;
+var _ = require('underscore');
+var Promise = require('bluebird');
+var Project = require('../../lib/models/Project');
 var projects = require('../../lib/controllers/project');
 var promiseIsExpectedError = require('../testUtils/testPromiseError');
+var bookshelf = require('../../lib/utils/bookshelf');
 
 describe('A new project can be created with a project name and a target dollar amount.', function(){
+
+  afterEach(function(done){
+    bookshelf.knex.raw('truncate projects')
+      .then(function(){
+        done();
+      });
+
+  });
 
   it ('Should return a promise that resolves to a new project', function(done) {
     var projectPromise = projects.createProject('A-Project', 200);

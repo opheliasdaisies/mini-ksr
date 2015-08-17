@@ -24,7 +24,10 @@ module.exports = function(grunt) {
 
     mochaTest: {
       test: {
-        src: ['tests/**/*.js']
+        src: ['tests/**/*.js'],
+        options: {
+          require: './tests/testUtils/testConfig.js'
+        }
       }
     }
 
