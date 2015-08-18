@@ -9,27 +9,20 @@ var Pledge = require('../../lib/models/Pledge');
 
 describe('Backers are able to contribute to a project.', function() {
 
-  // before(function(done){
-  //   project.createProject('Super-Project', 2000)
-  //     .then(function() {
-  //       done();
-  //     });
-  // })
+  before(function(){
+    return project.createProject('Super-Project', 2000);
+  })
 
-  // after(function(done){
-  //   bookshelf.knex.raw('truncate pledges')
-  //     .then(function(){
-  //       bookshelf.knex.raw('truncate projects')
-  //     })
-  //     .then(function(){
-  //       done();
-  //     });
+  after(function(){
+    return bookshelf.knex.raw('truncate pledges')
+      .then(function(){
+        bookshelf.knex.raw('truncate projects')
+      });
+  });
 
-  // });
+  it ('Should return a promise that resovles to a pledge.', function() {
 
-  it ('Should return a promise that resovles to a pledge.', function(done) {
-
-      var pledgePromise = pledge.backProject('Tom', 'Super-Project', 12345, 20)
+      return pledge.backProject('Tom', 'Super-Project', 12345, 20)
         .then(function(pledge) {
           expect(pledge).to.be.an('object');
           expect(pledge.get('backer')).to.equal('Tom');
@@ -43,10 +36,8 @@ describe('Backers are able to contribute to a project.', function() {
             .then(function(pledge){
               expect(pledge).to.exist;
             });
-        })
-        .then(function() {
-          done();
         });
+
   });
 
 });
