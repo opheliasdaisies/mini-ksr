@@ -1,10 +1,9 @@
 {
   "postgresql": {
-    "client": "pg",
-    "connection": {
-      "host": "127.0.0.1",
-      "user": "sara",
-      "database": "kickstarter"
-    }
+    "database": "kickstarter",
+    "user": "sara",
+    "password": "password",
+    "host": "localhost",
+    "dialect": "postgres"
   }
 }
