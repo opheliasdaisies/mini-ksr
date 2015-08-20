@@ -11,17 +11,25 @@ var promiseIsExpectedError = require('../testUtils/testPromiseError');
 
 describe('A new project can be created with a project name and a target dollar amount.', function(){
 
+  before(function(){
+    return Project.sync()
+    .catch(console.error);
+  });
+
   after(function(){
-    return Project.drop({cascade: true});
+    return Project.drop({cascade: true})
+    .catch(console.error);
   });
 
   it ('Should return a promise that resolves to a new project', function() {
     var projectPromise = projects.createProject('A-Project', 200);
     expect(projectPromise.then).to.be.a('function');
-    return projectPromise.then(function(project){
-      expect(project).to.be.an('object');
-      expect(project.get('name')).to.equal('A-Project');
-    });
+    return projectPromise
+      .then(function(project){
+        expect(project).to.be.an('object');
+        expect(project.get('name')).to.equal('A-Project');
+      })
+      .catch(console.error);
   });
 
   it ('Should return a promise that resolves to an error if the project\'s name includes invalid characters.', function() {
@@ -51,14 +59,20 @@ describe('A new project can be created with a project name and a target dollar a
   it ('Should have a target value that accepts dollars and cents.', function() {
     var projectPromise = projects.createProject('Our-Project', 100.25);
     return projectPromise.then(function(project){
-      expect(project.get('target')).to.equal(100.25);
+      expect(Number(project.get('target'))).to.equal(100.25);
+    })
+    .catch(function(err){
+      console.error(err.message);
+      expect(err).to.not.exist();
     });
   });
 
-  it ('Should return a promise taht resolves to an error if the target is preceeded with $', function() {
+  it ('Should return a promise that resolves to an error if the target is preceeded with $', function() {
     var projectPromise = projects.createProject('MoneyProject', '$500');
     var expectedError = 'You must enter a number for your project\'s target. Do not include a $ sign.';
     return promiseIsExpectedError(projectPromise, expectedError);
   });
+
+  // Add test to check for non-unique names
 
 });
