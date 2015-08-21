@@ -7,6 +7,7 @@ var Promise = require('bluebird');
 var Sequelize = require('sequelize');
 var Project = require('../../lib/models/Project');
 var projects = require('../../lib/controllers/project');
+var findExistingProject = require('../../lib/utils/findExistingProject');
 var promiseIsExpectedError = require('../testUtils/testPromiseError');
 
 describe('A new project can be created with a project name and a target dollar amount.', function(){
@@ -29,7 +30,16 @@ describe('A new project can be created with a project name and a target dollar a
         expect(project).to.be.an('object');
         expect(project.get('name')).to.equal('A-Project');
       })
-      .catch(console.error);
+      .then(function(){
+        return findExistingProject('A-Project');
+      })
+      .then(function(retrievedProject){
+        expect(retrievedProject).to.be.an('object');
+      })
+      .catch(function(err){
+        console.error(err);
+        expect(err).to.not.exist();
+      });
   });
 
   it ('Should return a promise that resolves to an error if the project\'s name includes invalid characters.', function() {
@@ -57,8 +67,8 @@ describe('A new project can be created with a project name and a target dollar a
   });
 
   it ('Should have a target value that accepts dollars and cents.', function() {
-    var projectPromise = projects.createProject('Our-Project', 100.25);
-    return projectPromise.then(function(project){
+    var projectPromise = projects.createProject('Total-New-Project', 100.25);
+      return projectPromise.then(function(project){
       expect(Number(project.get('target'))).to.equal(100.25);
     })
     .catch(function(err){
@@ -73,6 +83,10 @@ describe('A new project can be created with a project name and a target dollar a
     return promiseIsExpectedError(projectPromise, expectedError);
   });
 
-  // Add test to check for non-unique names
+  it ('Should return a promise that resolves to an error if the project name already exists', function() {
+      var projectPromise = projects.createProject('A-Project', 200000);
+      var expectedError = 'A project with the name A-Project already exists. Please try another name.'
+      return promiseIsExpectedError(projectPromise, expectedError);
+  });
 
 });
