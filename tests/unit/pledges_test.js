@@ -1,44 +1,58 @@
 'use strict';
 
+var promiseErrorHandling = require('../../lib/utils/promiseErrorHandling');
 var chai = require('chai');
 var expect = chai.expect;
-var bookshelf = require('../../lib/utils/bookshelf');
 var project = require('../../lib/controllers/project');
 var pledge = require('../../lib/controllers/pledge');
+var Project = require('../../lib/models/Project');
 var Pledge = require('../../lib/models/Pledge');
+var promiseIsExpectedError = require('../testUtils/testPromiseError');
 
 describe('Backers are able to contribute to a project.', function() {
 
   before(function(){
-    return project.createProject('Super-Project', 2000);
-  })
+    return Project.sync()
+      .then(function(){
+        return project.createProject('Super-Project', 2000)
+      }).then(function(){
+        Pledge.sync();
+      });
+  });
 
   after(function(){
-    return bookshelf.knex.raw('truncate pledges')
+    return Project.drop({cascade:true})
       .then(function(){
-        bookshelf.knex.raw('truncate projects')
+        Pledge.drop({cascade:true})
       });
   });
 
   it ('Should return a promise that resovles to a pledge.', function() {
-
-      return pledge.backProject('Tom', 'Super-Project', 12345, 20)
-        .then(function(pledge) {
-          expect(pledge).to.be.an('object');
-          expect(pledge.get('backer')).to.equal('Tom');
-          expect(pledge.get('creditCard')).to.equal(12345);
-          expect(pledge.get('amount')).to.equal(20);
-          return pledge.get('id');
-        })
-        .then(function(pledgeId) {
-          return new Pledge({id: pledgeId})
-            .fetch()
-            .then(function(pledge){
-              expect(pledge).to.exist;
-            });
-        });
-
+    return pledge.backProject('Tom', 'Super-Project', 12345, 20)
+      .then(function(pledge) {
+        expect(pledge).to.be.an('object');
+        expect(pledge.get('backer')).to.equal('Tom');
+        expect(Number(pledge.get('creditCard'))).to.equal(12345);
+        expect(Number(pledge.get('amount'))).to.equal(20);
+        return pledge.get('id');
+      })
+      .then(function(pledgeId) {
+        return Pledge.findById(pledgeId);
+      })
+      .then(function(pledge){
+        expect(pledge).to.be.an('object');
+      });
   });
+
+  // it ('Should return a promise that resovles to an error if the project doesn\'t exist.', function() {
+
+  //   // var pledgePromise = pledge.backProject('Jackelyn', 'OMG-A-Project', 12345, 1000);
+  //   // var expectedError = 'That project cannot be found.';
+  //   // return promiseIsExpectedError(pledgePromise, expectedError);
+
+  // });
+
+  // it ('Should return a promise that resovles to an error if arguments are missing.');
 
 });
 

@@ -4,7 +4,6 @@ var chai = require('chai');
 var expect = chai.expect;
 var _ = require('underscore');
 var Promise = require('bluebird');
-var Sequelize = require('sequelize');
 var Project = require('../../lib/models/Project');
 var projects = require('../../lib/controllers/project');
 var findExistingProject = require('../../lib/utils/findExistingProject');
