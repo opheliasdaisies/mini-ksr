@@ -28,10 +28,10 @@ describe('Backers are able to contribute to a project.', function() {
   });
 
   it ('Should return a promise that resovles to a pledge.', function() {
-    return pledge.backProject('Tom', 'Super-Project', 12345, 20)
+    return pledge.backProject('Thomas', 'Super-Project', 12345, 20)
       .then(function(pledge) {
         expect(pledge).to.be.an('object');
-        expect(pledge.get('backer')).to.equal('Tom');
+        expect(pledge.get('backer')).to.equal('Thomas');
         expect(Number(pledge.get('creditCard'))).to.equal(12345);
         expect(Number(pledge.get('amount'))).to.equal(20);
         return pledge.get('id');
@@ -50,22 +50,35 @@ describe('Backers are able to contribute to a project.', function() {
     return promiseIsExpectedError(pledgePromise, expectedError);
   });
 
-  // it ('Should return a promise that resovles to an error if arguments are missing.');
+  it ('Should return a promise that resovles to an error if arguments are missing.', function() {
+    var pledgePromise = pledge.backProject('Jackelyn', 'Super-Project', 50);
+    var expectedError = 'You must supply the dollar amount you want to put towards the project.';
+    return promiseIsExpectedError(pledgePromise, expectedError);
+  });
+
+  it ('Should return a promise that resoves to an error if backer name includes invalid characters.', function() {
+    var pledgePromise = pledge.backProject('Not A Backer', 'Super-Project', 12345, 1000);
+    var expectedError = 'Backer names can only include alphaneumeric characters, dashes, and underscores.';
+    return promiseIsExpectedError(pledgePromise, expectedError);
+  });
+
+  it ('Should return a promise that resolves to an error if the backer\'s name is less than 4 characters', function() {
+    var pledgePromise = pledge.backProject('Me', 'Super-Project', 12345, 1000);
+    var expectedError = 'Backer names must be longer than 3 characters.';
+    return promiseIsExpectedError(pledgePromise, expectedError);
+  });
+
+  it ('Should return a promise that resolves to an error if the backer\'s name is more than 20 characters', function() {
+    var pledgePromise = pledge.backProject('Everybody-Wants-To-Back-A-Project', 'Super-Project', 12345, 1000);
+    var expectedError = 'Backer names can not be longer than 20 characters.';
+    return promiseIsExpectedError(pledgePromise, expectedError);
+  });
+
+  it ('Should return a promise that ')
 
 });
 
 
-// **2.** The `back` input will back a project with a given name of the
-// backer, the project to be backed, a credit card number and a backing
-// dollar amount.
-
-// ~~~
-// back <given name> <project> <credit card number> <backing amount>
-// ~~~
-
-// * Given names should be alphanumeric and allow underscores or dashes.
-// * Given names should be no shorter than 4 characters but no longer than
-//   20 characters.
 // * Credit card numbers may vary in length, up to 19 characters.
 // * Credit card numbers will always be numeric.
 // * Card numbers should be validated using Luhn-10.

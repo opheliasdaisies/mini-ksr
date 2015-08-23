@@ -5,7 +5,8 @@ var promiseErrorHandling = require('../../lib/utils/promiseErrorHandling');
 
 function promiseIsExpectedError(promise, expectedMessage) {
   return promise
-    .then(function(){
+    .then(function(thing){
+      console.log("THING!!!!!!!!!!!!!!! " + thing);
       expect(true).to.not.exist;
     })
     .catch(function(err) {
