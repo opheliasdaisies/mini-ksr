@@ -1,12 +1,12 @@
 'use strict';
 
-var promiseErrorHandling = require('../../lib/utils/promiseErrorHandling');
 var chai = require('chai');
 var expect = chai.expect;
 var project = require('../../lib/controllers/project');
 var pledge = require('../../lib/controllers/pledge');
 var Project = require('../../lib/models/Project');
 var Pledge = require('../../lib/models/Pledge');
+var promiseErrorHandling = require('../../lib/utils/promiseErrorHandling');
 var promiseIsExpectedError = require('../testUtils/testPromiseError');
 
 describe('Backers are able to contribute to a project.', function() {

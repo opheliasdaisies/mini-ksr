@@ -12,13 +12,11 @@ var promiseIsExpectedError = require('../testUtils/testPromiseError');
 describe('A new project can be created with a project name and a target dollar amount.', function(){
 
   before(function(){
-    return Project.sync()
-    .catch(console.error);
+    return Project.sync();
   });
 
   after(function(){
-    return Project.drop({cascade: true})
-    .catch(console.error);
+    return Project.drop({cascade: true});
   });
 
   it ('Should return a promise that resolves to a new project', function() {
@@ -34,10 +32,6 @@ describe('A new project can be created with a project name and a target dollar a
       })
       .then(function(retrievedProject){
         expect(retrievedProject).to.be.an('object');
-      })
-      .catch(function(err){
-        console.error(err);
-        expect(err).to.not.exist();
       });
   });
 
@@ -69,10 +63,6 @@ describe('A new project can be created with a project name and a target dollar a
     var projectPromise = projects.createProject('Total-New-Project', 100.25);
       return projectPromise.then(function(project){
       expect(Number(project.get('target'))).to.equal(100.25);
-    })
-    .catch(function(err){
-      console.error(err.message);
-      expect(err).to.not.exist();
     });
   });
 
