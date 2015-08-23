@@ -60,7 +60,7 @@ describe('A new project can be created with a project name and a target dollar a
   });
 
   it ('Should have a target value that accepts dollars and cents.', function() {
-    var projectPromise = projects.createProject('Total-New-Project', 100.25);
+    var projectPromise = projects.createProject('Total_New_Project', 100.25);
       return projectPromise.then(function(project){
       expect(Number(project.get('target'))).to.equal(100.25);
     });

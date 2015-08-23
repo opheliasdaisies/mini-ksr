@@ -44,13 +44,11 @@ describe('Backers are able to contribute to a project.', function() {
       });
   });
 
-  // it ('Should return a promise that resovles to an error if the project doesn\'t exist.', function() {
-
-  //   // var pledgePromise = pledge.backProject('Jackelyn', 'OMG-A-Project', 12345, 1000);
-  //   // var expectedError = 'That project cannot be found.';
-  //   // return promiseIsExpectedError(pledgePromise, expectedError);
-
-  // });
+  it ('Should return a promise that resovles to an error if the project doesn\'t exist.', function() {
+    var pledgePromise = pledge.backProject('Jackelyn', 'OMG-A-Project', 12345, 1000);
+    var expectedError = 'You must supply the name of a valid project to back it.';
+    return promiseIsExpectedError(pledgePromise, expectedError);
+  });
 
   // it ('Should return a promise that resovles to an error if arguments are missing.');
 
