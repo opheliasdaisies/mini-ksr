@@ -106,8 +106,17 @@ describe('Backers are able to contribute to a project.', function() {
       });
   });
 
-  it ('Should have a pledge value that accepts dollars and cents.');
+  it ('Should have a pledge value that accepts dollars and cents.', function() {
+    return pledge.backProject('Kimberly', 'Super-Project', '252449686234', 50.75)
+      .then(function(project){
+        expect(Number(project.get('amount'))).to.equal(50.75);
+      });
+  });
 
-  it ('Should return a promise that rejects with an error if the target is preceeded with $');
+  it ('Should return a promise that rejects with an error if the target is preceeded with $', function() {
+    var pledgePromise = pledge.backProject('Kristopher', 'Super-Project', '4448356823556', '$500');
+    var expectedError = 'You must enter a number for the amount of your pledge. Do not include a $ sign.';
+    return promiseIsExpectedError(pledgePromise, expectedError);
+  });
 
 });
