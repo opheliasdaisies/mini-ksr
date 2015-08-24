@@ -45,31 +45,31 @@ describe('Backers are able to contribute to a project.', function() {
   });
 
   it ('Should return a promise that rejects with an error if the project doesn\'t exist.', function() {
-    var pledgePromise = pledge.backProject('Jackelyn', 'OMG-A-Project', '4111111111111111', 1000);
+    var pledgePromise = pledge.backProject('Jackelyn', 'OMG-A-Project', '146112832876245', 1000);
     var expectedError = 'You must supply the name of a valid project to back it.';
     return promiseIsExpectedError(pledgePromise, expectedError);
   });
 
   it ('Should return a promise that rejects with an error if arguments are missing.', function() {
-    var pledgePromise = pledge.backProject('Jackelyn', 'Super-Project', '4111111111111111');
+    var pledgePromise = pledge.backProject('Jackelyn', 'Super-Project', '146112832876245');
     var expectedError = 'You must supply the dollar amount you want to put towards the project.';
     return promiseIsExpectedError(pledgePromise, expectedError);
   });
 
   it ('Should return a promise that rejects with an error if backer name includes invalid characters.', function() {
-    var pledgePromise = pledge.backProject('Not A Backer', 'Super-Project', '4111111111111111', 1000);
+    var pledgePromise = pledge.backProject('Not A Backer', 'Super-Project', '146112832876245', 1000);
     var expectedError = 'Backer names can only include alphaneumeric characters, dashes, and underscores.';
     return promiseIsExpectedError(pledgePromise, expectedError);
   });
 
   it ('Should return a promise that rejects with an error if the backer\'s name is less than 4 characters', function() {
-    var pledgePromise = pledge.backProject('Me', 'Super-Project', '4111111111111111', 1000);
+    var pledgePromise = pledge.backProject('Me', 'Super-Project', '146112832876245', 1000);
     var expectedError = 'Backer names must be longer than 3 characters.';
     return promiseIsExpectedError(pledgePromise, expectedError);
   });
 
   it ('Should return a promise that rejects with an error if the backer\'s name is more than 20 characters', function() {
-    var pledgePromise = pledge.backProject('Everybody-Wants-To-Back-A-Project', 'Super-Project', '4111111111111111', 1000);
+    var pledgePromise = pledge.backProject('Everybody-Wants-To-Back-A-Project', 'Super-Project', '146112832876245', 1000);
     var expectedError = 'Backer names can not be longer than 20 characters.';
     return promiseIsExpectedError(pledgePromise, expectedError);
   });
@@ -92,7 +92,19 @@ describe('Backers are able to contribute to a project.', function() {
     return promiseIsExpectedError(pledgePromise, expectedError);
   });
 
-  it ('Should return a promise that rejects with an error if the credit card number entered has already been used.');
+  it ('Should return a promise that rejects with an error if the credit card number entered has already been used.', function(){
+    return pledge.backProject('Shirley', 'Super-Project', '4111111111111111', 10)
+      .then(function(){
+        pledge.backProject('Steve', 'Super-Project', '4111111111111111', 200);
+      })
+      .then(function(){
+        expect(true).to.not.exist;
+      })
+      .catch(function(err) {
+        expect(err).to.be.an.instanceof(Error);
+        expect(err.message).to.equal('That credit card has already been used. Please use a different credit card.');
+      });
+  });
 
   it ('Should have a pledge value that accepts dollars and cents.');
 
