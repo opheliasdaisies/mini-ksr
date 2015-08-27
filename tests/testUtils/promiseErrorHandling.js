@@ -1,6 +1,7 @@
 'use strict';
 
-var Promise = require('bluebird');
+var sequelize = require('../../lib/utils/sequelize');
+var Promise = sequelize.Promise;
 Promise.onPossiblyUnhandledRejection(function (error) {
   throw error;
 });

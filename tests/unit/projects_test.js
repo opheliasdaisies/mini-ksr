@@ -9,6 +9,15 @@ var expect = chai.expect;
 var project = require('../../lib/controllers/project');
 var pledge = require('../../lib/controllers/pledge');
 var findExistingProject = require('../../lib/utils/findExistingProject');
+var sequelize = require('../../lib/utils/sequelize');
+
+tap.test('Sync the tables in postgres. Must succeed for tests to run.', {bail: true}, function(t){
+  return sequelize.sync({force: true})
+    .then(function(db){
+      t.ok(db, 'table setup must succeed');
+      t.end();
+    });
+});
 
 tap.test('Should be able to create a new project', function(t) {
   setupDB()
