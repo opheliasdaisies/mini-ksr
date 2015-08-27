@@ -27,25 +27,14 @@ module.exports = function (grunt) {
       options: {
         config: '.jsbeautifyrc'
       }
-    },
-
-    mochaTest: {
-      test: {
-        src: ['tests/**/*.js'],
-        options: {
-          require: './tests/testUtils/testConfig.js'
-        }
-      }
     }
 
   });
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-jscs');
-  grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-jsbeautifier');
 
   grunt.registerTask('default', ['jsbeautifier', 'jshint', 'jscs']);
-  grunt.registerTask('test', 'mochaTest');
 
 };

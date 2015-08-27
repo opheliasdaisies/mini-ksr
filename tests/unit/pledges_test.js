@@ -1,122 +1,258 @@
 'use strict';
 
+require('../testUtils/testConfig');
+
+var tap = require('tap');
+var setupDB = require('../testUtils/databaseSetupBeforeTest');
 var chai = require('chai');
 var expect = chai.expect;
 var project = require('../../lib/controllers/project');
 var pledge = require('../../lib/controllers/pledge');
-var Project = require('../../lib/models/Project');
 var Pledge = require('../../lib/models/Pledge');
-var promiseErrorHandling = require('../../lib/utils/promiseErrorHandling');
-var promiseIsExpectedError = require('../testUtils/testPromiseError');
 
-describe('Backers are able to contribute to a project.', function() {
+tap.test('Should be able to back a project with a pledge.', function(t) {
+  setupDB()
+    .then(function() {
+      // Back a project
+      return pledge.backProject('Thomas', 'Super-Project', '4111111111111111', 20)
+    })
+    .then(function(createdPledge) {
+      expect(createdPledge).to.be.an('object');
+      expect(createdPledge.get('backer')).to.equal('Thomas');
+      expect(createdPledge.get('creditCard')).to.equal('4111111111111111');
+      expect(Number(createdPledge.get('amount'))).to.equal(20);
 
-  before(function(){
-    return Project.sync()
-      .then(function(){
-        return project.createProject('Super-Project', 2000)
-      }).then(function(){
-        Pledge.sync();
-      });
-  });
+      // return the id of the created pledge to retrieve it.
+      return createdPledge.get('id');
+    })
+    .then(function(pledgeId) {
+      // find the created pledge
+      return Pledge.findById(pledgeId);
+    })
+    .then(function(retrievedPledge){
+      // check if retrieved pledge matches the pledge created in test
+      expect(retrievedPledge).to.be.an('object');
+      expect(retrievedPledge.get('backer')).to.equal('Thomas');
+      expect(retrievedPledge.get('amount')).to.equal('20');
+      t.end();
+    });
+});
 
-  after(function(){
-    return Project.drop({cascade:true})
-      .then(function(){
-        Pledge.drop({cascade:true})
-      });
-  });
+tap.test('Should not be able to back a project that doesn\'t exist.', function(t){
+  setupDB()
+    .then(function() {
+      // back a project that has not been created
+      return pledge.backProject('Jackelyn', 'OMG-A-Project', '146112832876245', 1000);
+    })
+   .then(function(createdPledge){
+      // if the pledge is created the test will fail.
+      expect(createdPledge).to.not.exist();
+      t.end();
+    })
+    .catch(function(err){
+      var expectedMessage = 'You must supply the name of a valid project to back it.';
+      expect(err).to.be.an.instanceof(Error);
+      expect(err.message).to.equal(expectedMessage);
+      t.end();
+    });
+});
 
-  it ('Should return a promise that resovles to a pledge.', function() {
-    return pledge.backProject('Thomas', 'Super-Project', '4111111111111111', 20)
-      .then(function(pledge) {
-        expect(pledge).to.be.an('object');
-        expect(pledge.get('backer')).to.equal('Thomas');
-        expect(pledge.get('creditCard')).to.equal('4111111111111111');
-        expect(Number(pledge.get('amount'))).to.equal(20);
-        return pledge.get('id');
-      })
-      .then(function(pledgeId) {
-        return Pledge.findById(pledgeId);
-      })
-      .then(function(pledge){
-        expect(pledge).to.be.an('object');
-      });
-  });
+tap.test('Should not be able to back a project if arguments are missing.', function(t){
+  setupDB()
+    .then(function() {
+      // back a project without a pledge amount.
+      return pledge.backProject('Jackelyn', 'Super-Project', '146112832876245');
+    })
+   .then(function(createdPledge){
+      // if the pledge is created the test will fail.
+      expect(createdPledge).to.not.exist();
+      t.end();
+    })
+    .catch(function(err){
+      var expectedMessage = 'You must supply the dollar amount you want to put towards the project.';
+      expect(err).to.be.an.instanceof(Error);
+      expect(err.message).to.equal(expectedMessage);
+      t.end();
+    });
+});
 
-  it ('Should return a promise that rejects with an error if the project doesn\'t exist.', function() {
-    var pledgePromise = pledge.backProject('Jackelyn', 'OMG-A-Project', '146112832876245', 1000);
-    var expectedError = 'You must supply the name of a valid project to back it.';
-    return promiseIsExpectedError(pledgePromise, expectedError);
-  });
+tap.test('Should only accept alphaneumeric characters, dashes, and underscores for the backer\'s name.', function(t){
+  setupDB()
+    .then(function() {
+      // back a project with the backer name including invalid characters
+      return pledge.backProject('Not A Backer', 'Super-Project', '146112832876245', 1000);
+    })
+   .then(function(createdPledge){
+      // if the pledge is created the test will fail.
+      expect(createdPledge).to.not.exist();
+      t.end();
+    })
+    .catch(function(err){
+      var expectedMessage = 'Backer names can only include alphaneumeric characters, dashes, and underscores.';
+      expect(err).to.be.an.instanceof(Error);
+      expect(err.message).to.equal(expectedMessage);
+      t.end();
+    });
+});
 
-  it ('Should return a promise that rejects with an error if arguments are missing.', function() {
-    var pledgePromise = pledge.backProject('Jackelyn', 'Super-Project', '146112832876245');
-    var expectedError = 'You must supply the dollar amount you want to put towards the project.';
-    return promiseIsExpectedError(pledgePromise, expectedError);
-  });
+tap.test('Should only accept backer names 4 characters or longer.', function(t){
+  setupDB()
+    .then(function() {
+      // back a project with a short backer name
+      return pledge.backProject('Me', 'Super-Project', '146112832876245', 1000);
+    })
+   .then(function(createdPledge){
+      // if the pledge is created the test will fail.
+      expect(createdPledge).to.not.exist();
+      t.end();
+    })
+    .catch(function(err){
+      var expectedMessage = 'Backer names must be longer than 3 characters.';
+      expect(err).to.be.an.instanceof(Error);
+      expect(err.message).to.equal(expectedMessage);
+      t.end();
+    });
+});
 
-  it ('Should return a promise that rejects with an error if backer name includes invalid characters.', function() {
-    var pledgePromise = pledge.backProject('Not A Backer', 'Super-Project', '146112832876245', 1000);
-    var expectedError = 'Backer names can only include alphaneumeric characters, dashes, and underscores.';
-    return promiseIsExpectedError(pledgePromise, expectedError);
-  });
+tap.test('Should only accept backer names 20 characters or shorter.', function(t) {
+  setupDB()
+    .then(function() {
+      // back a project with a long backer name
+      return pledge.backProject('Everybody-Wants-To-Back-A-Project', 'Super-Project', '146112832876245', 1000);
+    })
+   .then(function(createdPledge){
+      // if the pledge is created the test will fail.
+      expect(createdPledge).to.not.exist();
+      t.end();
+    })
+    .catch(function(err){
+      var expectedMessage = 'Backer names can not be longer than 20 characters.';
+      expect(err).to.be.an.instanceof(Error);
+      expect(err.message).to.equal(expectedMessage);
+      t.end();
+    });
+});
 
-  it ('Should return a promise that rejects with an error if the backer\'s name is less than 4 characters', function() {
-    var pledgePromise = pledge.backProject('Me', 'Super-Project', '146112832876245', 1000);
-    var expectedError = 'Backer names must be longer than 3 characters.';
-    return promiseIsExpectedError(pledgePromise, expectedError);
-  });
+tap.test('Should only accept credit card numbers 19 characters or shorter.', function(t) {
+  setupDB()
+    .then(function() {
+      // back a project with a long credit card
+      return pledge.backProject('Ida_Backer', 'Super-Project', '212121418472837192612491612', 1000);
+    })
+   .then(function(createdPledge){
+      // if the pledge is created the test will fail.
+      expect(createdPledge).to.not.exist();
+      t.end();
+    })
+    .catch(function(err){
+      var expectedMessage = 'Credit card numbers can not be longer than 19 characters.';
+      expect(err).to.be.an.instanceof(Error);
+      expect(err.message).to.equal(expectedMessage);
+      t.end();
+    });
+});
 
-  it ('Should return a promise that rejects with an error if the backer\'s name is more than 20 characters', function() {
-    var pledgePromise = pledge.backProject('Everybody-Wants-To-Back-A-Project', 'Super-Project', '146112832876245', 1000);
-    var expectedError = 'Backer names can not be longer than 20 characters.';
-    return promiseIsExpectedError(pledgePromise, expectedError);
-  });
+tap.test('Should only accept numeric credit cards.', function(t){
+  setupDB()
+    .then(function() {
+      // back a project with a credit card with invalid characters
+      return pledge.backProject('Ida_Backer', 'Super-Project', '871-802', 1000);
+    })
+   .then(function(createdPledge){
+      // if the pledge is created the test will fail.
+      expect(createdPledge).to.not.exist();
+      t.end();
+    })
+    .catch(function(err){
+      var expectedMessage = 'Credit cards must contain only numeric characters.';
+      expect(err).to.be.an.instanceof(Error);
+      expect(err.message).to.equal(expectedMessage);
+      t.end();
+    });
+});
 
-  it ('Should return a promise that rejects with an error if credit card numbers are longer than 19 characters.', function() {
-    var pledgePromise = pledge.backProject('Ida_Backer', 'Super-Project', '212121418472837192612491612', 1000);
-    var expectedError = 'Credit card numbers can not be longer than 19 characters.';
-    return promiseIsExpectedError(pledgePromise, expectedError);
-  });
+tap.test('Should only accept credit cards that pass Luhn-10 validation.', function(t){
+  setupDB()
+    .then(function() {
+      // back a project with a credit card that does not pass Luhn-10.
+      return pledge.backProject('Ida_Backer', 'Super-Project', '4111111111111112', 1000);
+    })
+   .then(function(createdPledge){
+      // if the pledge is created the test will fail.
+      expect(createdPledge).to.not.exist();
+      t.end();
+    })
+    .catch(function(err){
+      var expectedMessage = 'Entered credit card number is invalid.';
+      expect(err).to.be.an.instanceof(Error);
+      expect(err.message).to.equal(expectedMessage);
+      t.end();
+    });
+});
 
-  it ('Should return a promise that rejects with an error if credit card numbers are not numeric.', function() {
-    var pledgePromise = pledge.backProject('Ida_Backer', 'Super-Project', '871 802', 1000);
-    var expectedError = 'Credit cards must contain only numeric characters.';
-    return promiseIsExpectedError(pledgePromise, expectedError);
-  });
+tap.test('Should not accept a credit card that has already been used to back the project.', function(t){
+  setupDB()
+    .then(function(){
+      // Back 'Super-Project' with a credit card.
+      return pledge.backProject('Shirley', 'Super-Project', '4111111111111111', 10);
+    })
+    .then(function(){
+      // Create a new project.
+      return project.createProject('Going-To-Mars', 500);
+    })
+    .then(function(){
+      // Back new project with the same credit card
+      return pledge.backProject('Steve', 'Going-To-Mars', '4111111111111111', 20);
+    })
+    .then(function(createdPledge){
+      // Expect new project to be backed successfully
+      expect(createdPledge.get('backer')).to.equal('Steve');
+      expect(createdPledge.get('amount')).to.equal('20');
+    })
+    .then(function(){
+      // Back 'Super-Project' again with the same credit card.'
+      return pledge.backProject('Steve', 'Super-Project', '4111111111111111', 200);
+    })
+    .then(function(){
+      // if the pledge is created the test will fail.
+      expect(true).to.not.exist;
+      t.end();
+    })
+    .catch(function(err) {
+      // Expect backing 'Super-Project' with the credit card will fail
+      expect(err).to.be.an.instanceof(Error);
+      expect(err.message).to.equal('That credit card has already been used. Please use a different credit card.');
+      t.end();
+    });
+});
 
-  it ('Should return a promise that rejects with an error if credit card numbers do not pass Luhn-10 validation.', function() {
-    var pledgePromise = pledge.backProject('Ida_Backer', 'Super-Project', '4111111111111112', 1000);
-    var expectedError = 'Entered credit card number is invalid.';
-    return promiseIsExpectedError(pledgePromise, expectedError);
-  });
+tap.test('Should have a pledge value that accepts dollars and cents.', function(t) {
+  setupDB()
+    .then(function(){
+      // Back a project with a pledge value with dollars and cents
+      return pledge.backProject('Kimberly', 'Super-Project', '252449686234', 50.75);
+    })
+    .then(function(createdPledge){
+      expect(Number(createdPledge.get('amount'))).to.equal(50.75);
+      t.end();
+    });
+});
 
-  it ('Should return a promise that rejects with an error if the credit card number entered has already been used.', function(){
-    return pledge.backProject('Shirley', 'Super-Project', '4111111111111111', 10)
-      .then(function(){
-        pledge.backProject('Steve', 'Super-Project', '4111111111111111', 200);
-      })
-      .then(function(){
-        expect(true).to.not.exist;
-      })
-      .catch(function(err) {
-        expect(err).to.be.an.instanceof(Error);
-        expect(err.message).to.equal('That credit card has already been used. Please use a different credit card.');
-      });
-  });
-
-  it ('Should have a pledge value that accepts dollars and cents.', function() {
-    return pledge.backProject('Kimberly', 'Super-Project', '252449686234', 50.75)
-      .then(function(project){
-        expect(Number(project.get('amount'))).to.equal(50.75);
-      });
-  });
-
-  it ('Should return a promise that rejects with an error if the target is preceeded with $', function() {
-    var pledgePromise = pledge.backProject('Kristopher', 'Super-Project', '4448356823556', '$500');
-    var expectedError = 'You must enter a number for the amount of your pledge. Do not include a $ sign.';
-    return promiseIsExpectedError(pledgePromise, expectedError);
-  });
-
+tap.test('Should not accept a pledge value preceeded by a $ sign.', function(t){
+  setupDB()
+    .then(function() {
+      // back a project with $ preceeding the pledge value
+      return pledge.backProject('Kristopher', 'Super-Project', '4448356823556', '$500');
+    })
+   .then(function(createdPledge){
+      // if the pledge is created the test will fail.
+      expect(createdPledge).to.not.exist();
+      t.end();
+    })
+    .catch(function(err){
+      var expectedMessage = 'You must enter a number for the amount of your pledge. Do not include a $ sign.';
+      expect(err).to.be.an.instanceof(Error);
+      expect(err.message).to.equal(expectedMessage);
+      t.end();
+    });
 });

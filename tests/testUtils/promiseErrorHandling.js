@@ -6,4 +6,4 @@ Promise.onPossiblyUnhandledRejection(function (error) {
 });
 Promise.longStackTraces();
 
-module.exports = Promise;
+// module.exports = Promise;
