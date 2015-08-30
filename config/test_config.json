@@ -1,8 +1,6 @@
 {
   "postgresql": {
     "database": "kickstarter_test",
-    "user": "sara",
-    "password": "password",
     "host": "localhost",
     "dialect": "postgres"
   }

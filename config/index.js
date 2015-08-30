@@ -10,8 +10,16 @@ var env = process.env.NODE_ENV;
 
 nconf.use('memory');
 
-nconf.argv()
+function getCustomConfigPath() {
+  var home = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+  var configFile = '/' + env + '_config_ks.json';
+  return path.join(home, configFile);
+}
+
+nconf
   .env()
-  .file(path.join(__dirname, env + '_config.json'));
+  .file('custom', getCustomConfigPath())
+  .file('default', path.join(__dirname, env + '_config.json'));
+
 
 module.exports = nconf;
