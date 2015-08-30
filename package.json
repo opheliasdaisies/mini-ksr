@@ -2,10 +2,13 @@
   "name": "mini-ksr",
   "version": "1.0.0",
   "description": "A command-line program with basic Kickstarter functionality of creating and backing projects.",
-  "main": "index.js",
+  "main": "kickstarter.js",
   "scripts": {
-    "start": "node index",
+    "start": "node kickstarter",
     "test": "tap -Rnyan tests/unit/*.js"
+  },
+  "bin": {
+    "kickstarter": "./kickstarter.js"
   },
   "author": "Sara Gorecki",
   "dependencies": {
