@@ -189,3 +189,7 @@ tap.test('Should list all pledges towards a specified project.', function(t) {
       t.end();
     });
 });
+
+tap.test('Close the connection to the database.', function() {
+  sequelize.close();
+});

@@ -23,7 +23,7 @@ tap.test('Should be able to back a project with a pledge.', function(t) {
   setupDB()
     .then(function() {
       // Back a project
-      return pledge.backProject('Thomas', 'Super-Project', '4111111111111111', 20)
+      return pledge.backProject('Thomas', 'Super-Project', '4111111111111111', 20);
     })
     .then(function(createdPledge) {
       expect(createdPledge).to.be.an('object');
@@ -292,4 +292,8 @@ tap.test('Should list all projects a backer has backed.', function(t) {
       expect(retrievedPledges[1].amount).to.equal('20');
       t.end();
     });
+});
+
+tap.test('Close the connection to the database.', function() {
+  sequelize.close();
 });
