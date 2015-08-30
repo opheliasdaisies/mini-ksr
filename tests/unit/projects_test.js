@@ -171,7 +171,7 @@ tap.test('Should list all pledges towards a specified project.', function(t) {
   setupDB()
     .then(function() {
       // back the project 'Super-Project', which is created in setupDB
-      pledge.backProject('Mary', 'Super-Project', '9145210', 20)
+      return pledge.backProject('Mary', 'Super-Project', '9145210', 20)
     })
     .then(function() {
       // make a second pledge towards 'Super-Project'

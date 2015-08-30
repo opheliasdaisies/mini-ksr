@@ -78,7 +78,7 @@ tap.test('Should not be able to back a project if arguments are missing.', funct
       t.end();
     })
     .catch(function(err) {
-      var expectedMessage = 'You must supply the dollar amount you want to put towards the project.';
+      var expectedMessage = 'You must supply the dollar amount you want to put towards the project. Do not include a $ sign.';
       expect(err).to.be.an.instanceof(Error);
       expect(err.message).to.equal(expectedMessage);
       t.end();
