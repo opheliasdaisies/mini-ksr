@@ -14,7 +14,7 @@ You also have the option to install Mini Kickstarter locally to a specific direc
 
 This project uses PostgreSQL. Before running Mini Kickstarter, make sure you have Postgres installed and running.
 
-By default, Mini Kickstarter will look for a Postgres database named 'kickstarter' with no username or password. Under this default, if you create a 'kickstarter' database you will be good to go!
+By default, Mini Kickstarter will look for a Postgres database named 'kickstarter' with no username or password. Under this default, if you create a 'kickstarter' database you will be good to go! Most systems will let you use the command `createdb kickstarter` to do this.
 
 If this doesn't work for your setup, you can create a custom config in your home directory. The custom config file should be named `<NODE_ENV>_config_ks.json`. Mini-Kickstarter devaults NODE_ENV to 'devleopment'. The config file should follow this structure:
 ```json
