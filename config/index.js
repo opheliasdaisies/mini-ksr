@@ -16,6 +16,8 @@ function getCustomConfigPath() {
   return path.join(home, configFile);
 }
 
+// If a custom config file is found in the user's home directory, that will be used.
+// If there is no custom config file, the defaults of 'development_config.json' and 'test_config.json' will be used.
 nconf
   .env()
   .file('custom', getCustomConfigPath())
