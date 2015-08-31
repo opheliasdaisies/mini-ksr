@@ -8,7 +8,7 @@ var chai = require('chai');
 var expect = chai.expect;
 var Project = require('../../lib/models/Project');
 var Pledge = require('../../lib/models/Pledge');
-var inputDispatcher = require('../../lib/controllers/inputDispatcher');
+var inputDispatcher = require('../../lib/cli/inputDispatcher');
 var sequelize = require('../../lib/utils/sequelize');
 var findExistingProjects = require('../../lib/utils/findExistingProject');
 

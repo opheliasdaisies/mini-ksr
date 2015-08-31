@@ -3,7 +3,7 @@
 'use strict';
 
 var yargs = require('yargs');
-var inputDispatcher = require('./lib/controllers/inputDispatcher');
+var inputDispatcher = require('./lib/cli/inputDispatcher');
 var sequelize = require('./lib/utils/sequelize');
 var Promise = sequelize.Promise;
 
