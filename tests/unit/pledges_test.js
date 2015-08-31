@@ -27,12 +27,12 @@ tap.test('Should be able to back a project with a pledge.', function(t) {
     })
     .then(function(createdPledge) {
       expect(createdPledge).to.be.an('object');
-      expect(createdPledge.get('backer')).to.equal('Thomas');
-      expect(createdPledge.get('creditCard')).to.equal('4111111111111111');
-      expect(Number(createdPledge.get('amount'))).to.equal(20);
+      expect(createdPledge.backer).to.equal('Thomas');
+      expect(createdPledge.creditCard).to.equal('4111111111111111');
+      expect(Number(createdPledge.amount)).to.equal(20);
 
       // return the id of the created pledge to retrieve it.
-      return createdPledge.get('id');
+      return createdPledge.id;
     })
     .then(function(pledgeId) {
       // find the created pledge
@@ -41,8 +41,8 @@ tap.test('Should be able to back a project with a pledge.', function(t) {
     .then(function(retrievedPledge) {
       // check if retrieved pledge matches the pledge created in test
       expect(retrievedPledge).to.be.an('object');
-      expect(retrievedPledge.get('backer')).to.equal('Thomas');
-      expect(retrievedPledge.get('amount')).to.equal('20');
+      expect(retrievedPledge.backer).to.equal('Thomas');
+      expect(retrievedPledge.amount).to.equal('20');
       t.end();
     });
 });
@@ -215,8 +215,8 @@ tap.test('Should not accept a credit card that has already been used to back the
     })
     .then(function(createdPledge) {
       // Expect new project to be backed successfully
-      expect(createdPledge.get('backer')).to.equal('Steve');
-      expect(createdPledge.get('amount')).to.equal('20');
+      expect(createdPledge.backer).to.equal('Steve');
+      expect(createdPledge.amount).to.equal('20');
     })
     .then(function() {
       // Back 'Super-Project' again with the same credit card.'
@@ -242,7 +242,7 @@ tap.test('Should have a pledge value that accepts dollars and cents.', function(
       return pledge.backProject('Kimberly', 'Super-Project', '252449686234', 50.75);
     })
     .then(function(createdPledge) {
-      expect(Number(createdPledge.get('amount'))).to.equal(50.75);
+      expect(Number(createdPledge.amount)).to.equal(50.75);
       t.end();
     });
 });

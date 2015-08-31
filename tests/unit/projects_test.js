@@ -27,7 +27,7 @@ tap.test('Should be able to create a new project', function(t) {
     })
     .then(function(createdProject) {
       expect(createdProject).to.be.an('object');
-      expect(createdProject.get('name')).to.equal('A-Project');
+      expect(createdProject.name).to.equal('A-Project');
 
       // retrieve created project from db
       return findExistingProject('A-Project');
@@ -35,7 +35,7 @@ tap.test('Should be able to create a new project', function(t) {
     .then(function(retrievedProject) {
       // make sure correct project was retrieved
       expect(retrievedProject).to.be.an('object');
-      expect(retrievedProject.get('name')).to.equal('A-Project');
+      expect(retrievedProject.name).to.equal('A-Project');
       t.end();
     });
 });
@@ -124,7 +124,7 @@ tap.test('Should have a target value that accepts dollars and cents.', function(
     })
     .then(function(createdProject) {
       // make sure created project has correct value
-      expect(createdProject.get('target')).to.equal('100.25');
+      expect(createdProject.target).to.equal('100.25');
       t.end();
     });
 });
@@ -182,10 +182,10 @@ tap.test('Should list all pledges towards a specified project.', function(t) {
       return project.listProject('Super-Project');
     })
     .then(function(project) {
-      expect(project.get('name')).to.equal('Super-Project');
-      expect(project.get('pledges')).to.be.an('array');
-      expect(project.get('pledges').length).to.equal(2);
-      expect(project.get('pledges')[0].backer).to.equal('Mary');
+      expect(project.name).to.equal('Super-Project');
+      expect(project.pledges).to.be.an('array');
+      expect(project.pledges.length).to.equal(2);
+      expect(project.pledges[0].backer).to.equal('Mary');
       t.end();
     });
 });
