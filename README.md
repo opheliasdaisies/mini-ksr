@@ -8,7 +8,7 @@ This project is built with Node.js. If you do not have Node installed, you can g
 
 To install Mini Kickstarter, run the command `npm install -g opheliasdaisies/mini-ksr` in your terminal. This will install the project globally, and it will be able to be run in any directory from the command line with the command `kickstarter`.
 
-You also have the option to install Mini Kickstarter locally to a specific directory. To do so, while in the directory you want to run the project from, run the command `npm install opheliasdaisies/mini-ksr`. This will install the project and you will be able to run it from the command line with the command `./kickstarter.js`.
+You also have the option to install Mini Kickstarter locally to a specific directory. To do so, clone the git repo and then while in the project directory run `npm install`. This will install the project and you will be able to run it from the command line with the command `./kickstarter.js`.
 
 ## Database Setup
 
