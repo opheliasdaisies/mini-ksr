@@ -2,32 +2,64 @@
 
 'use strict';
 
-var argv = require('yargs');
+var yargs = require('yargs');
 var subHelpOptions = require('./lib/utils/cmdLineHelpFunctions');
 var inputDispatcher = require('./lib/controllers/inputDispatcher');
 var sequelize = require('./lib/utils/sequelize');
 
-var args = argv.argv._;
+var args = yargs.argv._;
 var command = args.shift();
 
-argv
+var argv = yargs
   .usage('Usage: $0 <command> [arguments]')
   .command('project', 'Create a new project.\nTakes project name and target value as arguments.\n', subHelpOptions.project)
   .command('back', 'Back a project.\nTakes backer name, project name, credit card number, and pledge amount as arguments.\n', subHelpOptions.back)
   .command('list', 'List all pledges towards a project.\nTakes project name as argument.\n', subHelpOptions.list)
   .command('backer', 'List all pledges a backer has made.\nTakes backer name as argument.\n', subHelpOptions.backer)
-  .demand(2, 5, 'Please use a valid command and supply the correct number of arguments. The -help flag will provide more information for any given command.\n')
+
   .example('$0 project Project_Sugar_Cube 500', 'Create a project with the given project name and target goal.\n')
   .example('$0 back John Project_Sugar_Cube 4111111111111111 20', 'Back a given project with a credit card and an amount to pledge.\n')
   .example('$0 list Project_Sugar_Cube', 'List all pledges towards a given project.\n')
   .example('$0 backer John', 'List all the projects a backer has contributed to.\n')
+  .boolean('s')
+  .alias('s', 'sync')
+  .boolean('f')
+  .alias('f', 'force')
+  .describe({
+    s: 'Create the tables for the database. This must be used the first time the project is run.',
+    f: 'Append to the sync flag to force sync and overwrite the existing tables in the database. This will erase all data.'
+  })
   .help('h')
   .alias('h', 'help')
   .choices(command, ['project', 'back', 'list', 'backer'])
-  .wrap(argv.terminalWidth())
+  .wrap(yargs.terminalWidth())
   .argv;
 
-inputDispatcher(command, args)
-  .then(function(){
-    sequelize.close();
-  });
+function takeUserInput(cmd, argArr){
+  return inputDispatcher(cmd, argArr)
+    .catch(function(){
+      yargs.showHelp();
+    })
+    .finally(function(){
+      sequelize.close();
+    });
+}
+
+if (argv.sync) {
+  var options = (argv.f ? {force: true} : {});
+  var message = 'Tables have been created ';
+  message += (argv.f ? 'or overwritten.' : 'if they did not exist.');
+
+  return sequelize.sync(options)
+    .then(function(){
+      console.log(message);
+      if (command) {
+        return takeUserInput(command, args);
+      } else {
+        sequelize.close();
+      }
+    })
+    .catch(console.error);
+} else {
+  return takeUserInput(command, args);
+}
