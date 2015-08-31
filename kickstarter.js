@@ -6,9 +6,7 @@ var yargs = require('yargs');
 var subHelpOptions = require('./lib/utils/cmdLineHelpFunctions');
 var inputDispatcher = require('./lib/controllers/inputDispatcher');
 var sequelize = require('./lib/utils/sequelize');
-
-var args = yargs.argv._;
-var command = args.shift();
+var Promise = sequelize.Promise;
 
 var argv = yargs
   .usage('Usage: $0 <command> [arguments]')
@@ -35,31 +33,35 @@ var argv = yargs
   .wrap(yargs.terminalWidth())
   .argv;
 
+var args = argv._;
+var command = args.shift();
+
 function takeUserInput(cmd, argArr){
   return inputDispatcher(cmd, argArr)
     .catch(function(){
-      yargs.showHelp();
+      if (!argv.s){
+        yargs.showHelp();
+      }
     })
     .finally(function(){
       sequelize.close();
     });
 }
 
-if (argv.sync) {
-  var options = (argv.f ? {force: true} : {});
-  var message = 'Tables have been created ';
-  message += (argv.f ? 'or overwritten.' : 'if they did not exist.');
-
-  return sequelize.sync(options)
-    .then(function(){
-      console.log(message);
-      if (command) {
-        return takeUserInput(command, args);
-      } else {
-        sequelize.close();
-      }
-    })
-    .catch(console.error);
-} else {
-  return takeUserInput(command, args);
+function checkSyncOptions(argv){
+  if (argv.s) {
+    var options = (argv.f ? {force: true} : {});
+    var message = 'Tables have been created ';
+    message += (argv.f ? 'or overwritten.' : 'if they did not exist.');
+    return sequelize.sync(options)
+      .then(function(){
+        console.log(message);
+      });
+  }
+  return Promise.resolve();
 }
+
+checkSyncOptions(argv)
+  .then(function(){
+    return takeUserInput(command, args);
+  });
