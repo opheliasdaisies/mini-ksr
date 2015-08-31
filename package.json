@@ -13,6 +13,7 @@
   "author": "Sara Gorecki",
   "dependencies": {
     "checkit": "^0.5.1",
+    "mathjs": "^2.2.0",
     "nconf": "^0.7.2",
     "pg": "^4.4.1",
     "pg-hstore": "^2.3.2",
