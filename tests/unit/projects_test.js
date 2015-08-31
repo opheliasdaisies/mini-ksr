@@ -8,6 +8,7 @@ var chai = require('chai');
 var expect = chai.expect;
 var project = require('../../lib/controllers/project');
 var pledge = require('../../lib/controllers/pledge');
+var createProjectAndCheckForError = require('../testUtils/createProjectAndCheckForError');
 var findExistingProject = require('../../lib/utils/findExistingProject');
 var sequelize = require('../../lib/utils/sequelize');
 
@@ -40,21 +41,14 @@ tap.test('Should be able to create a new project', function(t) {
     });
 });
 
-tap.test('Should only allow project names to have alphaneumeric characters, dahses, and underscores.', function(t) {
+tap.test('Should only allow project names to have alphaneumeric characters, dashes, and underscores.', function(t) {
   setupDB()
     .then(function() {
-      // create a new project with invalid characters
-      return project.createProject('Project-%', 200);
-    })
-    .then(function(createdProject) {
-      // if the project is created the test will fail.
-      expect(createdProject).to.not.exist();
-      t.end();
-    })
-    .catch(function(err) {
       var expectedMessage = 'Project names can only include alphaneumeric characters, dashes, and underscores.';
-      expect(err).to.be.an.instanceof(Error);
-      expect(err.message).to.equal(expectedMessage);
+      // create a new project with invalid characters
+      return createProjectAndCheckForError('Project-%', 200, expectedMessage);
+    })
+    .then(function() {
       t.end();
     });
 });
@@ -62,18 +56,11 @@ tap.test('Should only allow project names to have alphaneumeric characters, dahs
 tap.test('Should only allow projects with names 4 characters or longer.', function(t) {
   setupDB()
     .then(function() {
-      // create a new project with a too-short name
-      return project.createProject('The', 500);
-    })
-   .then(function(createdProject) {
-      // if the project is created the test will fail.
-      expect(createdProject).to.not.exist();
-      t.end();
-    })
-    .catch(function(err) {
       var expectedMessage = 'Your project name must be longer than 3 characters.';
-      expect(err).to.be.an.instanceof(Error);
-      expect(err.message).to.equal(expectedMessage);
+      // create a new project with a too-short name
+      return createProjectAndCheckForError('The', 500, expectedMessage);
+    })
+   .then(function() {
       t.end();
     });
 });
@@ -81,18 +68,11 @@ tap.test('Should only allow projects with names 4 characters or longer.', functi
 tap.test('Should only allow projects with names 20 characters or shorter.', function(t){
   setupDB()
     .then(function() {
-      // create a new project with a too-short name
-      return project.createProject('The_Greatest_Project_To_Ever_Exist', 5000000000);
-    })
-   .then(function(createdProject) {
-      // if the project is created the test will fail.
-      expect(createdProject).to.not.exist();
-      t.end();
-    })
-    .catch(function(err) {
       var expectedMessage = 'Your project name can not be longer than 20 characters.';
-      expect(err).to.be.an.instanceof(Error);
-      expect(err.message).to.equal(expectedMessage);
+      // create a new project with a too-long name
+      return createProjectAndCheckForError('The_Greatest_Project_To_Ever_Exist', 5000000000, expectedMessage);
+    })
+   .then(function() {
       t.end();
     });
 });
@@ -100,18 +80,11 @@ tap.test('Should only allow projects with names 20 characters or shorter.', func
 tap.test('Should only allow projects that have a target value.', function(t) {
   setupDB()
     .then(function() {
-      // create a new project with no target
-      return project.createProject('Our-Project');
-    })
-   .then(function(createdProject) {
-      // if the project is created the test will fail.
-      expect(createdProject).to.not.exist();
-      t.end();
-    })
-    .catch(function(err) {
       var expectedMessage = 'You must supply a target value for your project.';
-      expect(err).to.be.an.instanceof(Error);
-      expect(err.message).to.equal(expectedMessage);
+      // create a new project with no target
+      return createProjectAndCheckForError('Our-Project', null, expectedMessage);
+    })
+   .then(function() {
       t.end();
     });
 });
@@ -132,18 +105,11 @@ tap.test('Should have a target value that accepts dollars and cents.', function(
 tap.test('Should not allow target to be preceeded by a $', function(t) {
   setupDB()
     .then(function() {
-      // create a new project with a dollar sign before the target value
-      return project.createProject('MoneyProject', '$500');
-    })
-   .then(function(createdProject) {
-      // if the project is created the test will fail.
-      expect(createdProject).to.not.exist();
-      t.end();
-    })
-    .catch(function(err) {
       var expectedMessage = 'You must enter a number for your project\'s target. Do not include a $ sign.';
-      expect(err).to.be.an.instanceof(Error);
-      expect(err.message).to.equal(expectedMessage);
+      // create a new project with a dollar sign before the target value
+      return createProjectAndCheckForError('MoneyProject', '$500', expectedMessage);
+    })
+   .then(function() {
       t.end();
     });
 });
@@ -151,18 +117,11 @@ tap.test('Should not allow target to be preceeded by a $', function(t) {
 tap.test('Should not allow a project to be created if the project name already exists.', function(t) {
   setupDB()
     .then(function() {
-      // create a new project with a name of an already-existing project
-      return project.createProject('Super-Project', 200000);
-    })
-   .then(function(createdProject) {
-      // if the project is created the test will fail.
-      expect(createdProject).to.not.exist();
-      t.end();
-    })
-    .catch(function(err) {
       var expectedMessage = 'A project with the name Super-Project already exists. Please try another name.';
-      expect(err).to.be.an.instanceof(Error);
-      expect(err.message).to.equal(expectedMessage);
+      // create a new project with a name of an already-existing project
+      return createProjectAndCheckForError('Super-Project', 200000, expectedMessage);
+    })
+   .then(function() {
       t.end();
     });
 });
